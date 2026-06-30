@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: light; }
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: #FBF9F4;
+  color: #0F1A2E;
+  font-family: Inter, ui-sans-serif, system-ui;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* paper grain — subtle, gives the ivory some life */
+.grain::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.4;
+  background-image: radial-gradient(rgba(15,26,46,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #E6E0D4; border-radius: 10px; border: 2px solid #FBF9F4; }
+::-webkit-scrollbar-thumb:hover { background: #d3c9b2; }
+
+*:focus-visible { outline: 2px solid #1A5C9E; outline-offset: 2px; border-radius: 4px; }
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

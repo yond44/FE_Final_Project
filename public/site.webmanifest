@@ -1,0 +1,11 @@
+{
+  "name": "Jojoba Economic Advisor",
+  "short_name": "Jojoba",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "theme_color": "#0F1A2E",
+  "background_color": "#FBF9F4",
+  "display": "standalone"
+}
