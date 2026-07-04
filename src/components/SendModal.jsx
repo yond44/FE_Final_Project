@@ -93,10 +93,25 @@ export default function SendModal({ payload, onClose }) {
       ) : (
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-ink2">Pick from your contacts</span>
-            <div className="flex gap-3">
-              <button onClick={() => setPicked(new Set(filtered.map((c) => c._id)))} className="text-[11px] font-semibold text-blue hover:underline">{t("common.all")}</button>
-              <button onClick={() => setPicked(new Set())} className="text-[11px] font-semibold text-muted hover:underline">Clear</button>
+            <span className="text-xs font-semibold text-ink2">{t("send.pickFromContacts")}</span>
+            <div className="flex items-center gap-3">
+              {picked.size > 0 && (
+                <span className="text-[11px] font-medium text-muted">{t("send.selectedCount", { n: picked.size })}</span>
+              )}
+              <button
+                onClick={() => setPicked(new Set(filtered.map((c) => c._id)))}
+                disabled={filtered.length === 0}
+                className="text-[11px] font-semibold text-blue hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
+              >
+                {t("common.all")}
+              </button>
+              <button
+                onClick={() => setPicked(new Set())}
+                disabled={picked.size === 0}
+                className="text-[11px] font-semibold text-muted hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
+              >
+                {t("common.clear")}
+              </button>
             </div>
           </div>
           <div className="relative mt-2">
@@ -109,7 +124,7 @@ export default function SendModal({ payload, onClose }) {
             />
           </div>
           <div className="mt-2 max-h-44 space-y-0.5 overflow-y-auto rounded-lg border border-line2 bg-white p-1">
-            {filtered.length === 0 && <p className="px-2 py-3 text-xs text-muted">No saved contacts. Add them on the Recipients page.</p>}
+            {filtered.length === 0 && <p className="px-2 py-3 text-xs text-muted">{t("send.noContacts")}</p>}
             {filtered.map((c) => {
               const on = picked.has(c._id);
               return (

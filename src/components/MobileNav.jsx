@@ -1,13 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { MessageSquare, Users, ListChecks, Clock, SendHorizonal } from "lucide-react";
+import { MessageSquare, Users, Clock, SendHorizonal } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext.jsx";
 
 const NAV = [
   { to: "/", key: "nav.m.chat", icon: MessageSquare, end: true },
   { to: "/send", key: "nav.m.send", icon: SendHorizonal },
   { to: "/recipients", key: "nav.m.recipients", icon: Users },
-  { to: "/queue", key: "nav.m.queue", icon: ListChecks },
   { to: "/history", key: "nav.m.history", icon: Clock },
 ];
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Search, Copy, Mail, Pencil, Check, X } from "lucide-react";
+import { Plus, Trash2, Search, Copy, Mail, Pencil, Check, X, AlertTriangle } from "lucide-react";
 import * as emailsApi from "../api/emails.js";
 import { useToast } from "../context/ToastContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
@@ -76,7 +76,15 @@ export default function Recipients() {
         }
       />
 
-      <Card className="mt-6 p-4">
+      <div className="mt-5 flex items-start gap-3 rounded-xl border-2 border-[#e8a23d] bg-[#fdf3e0] p-4 shadow-card">
+        <AlertTriangle size={20} className="mt-0.5 shrink-0 text-[#b3760f]" />
+        <div>
+          <div className="text-sm font-bold text-[#7a4d0a]">{t("rec.disclaimerTitle")}</div>
+          <p className="mt-0.5 text-[13px] leading-snug text-[#8a5a12]">{t("rec.disclaimerBody")}</p>
+        </div>
+      </div>
+
+      <Card className="mt-4 p-4">
         <div className="grid gap-3 sm:grid-cols-[1fr_1.4fr_auto]">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("rec.name")} />
           <Input

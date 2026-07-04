@@ -5,8 +5,6 @@ import { Login, Register } from "./pages/Auth.jsx";
 import Chat from "./pages/Chat.jsx";
 import Send from "./pages/Send.jsx";
 import Recipients from "./pages/Recipients.jsx";
-import Queue from "./pages/Queue.jsx";
-import Automation from "./pages/Automation.jsx";
 import History from "./pages/History.jsx";
 import Ticker from "./components/Ticker.jsx";
 import Sidebar from "./components/Sidebar.jsx";
@@ -52,8 +50,6 @@ export default function App() {
           <Route path="/" element={<Chat />} />
           <Route path="/send" element={<Send />} />
           <Route path="/recipients" element={<Recipients />} />
-          <Route path="/queue" element={<Queue />} />
-          <Route path="/automation" element={<Automation />} />
           <Route path="/history" element={<History />} />
         </Route>
       </Route>
