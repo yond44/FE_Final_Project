@@ -42,6 +42,7 @@ export default function Recipients() {
   }
 
   async function remove(id) {
+    if (!id) return toast.error(t("rec.deleteFail"));
     const prev = rows;
     setRows((r) => r.filter((e) => e._id !== id));
     try {

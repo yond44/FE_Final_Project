@@ -26,10 +26,10 @@ export default function SendModal({ payload, onClose }) {
     emailsApi.list().then((r) => setContacts(r.emails || [])).catch(() => {});
   }, []);
 
-  const toggle = (id) =>
+  const toggle = (email) =>
     setPicked((s) => {
       const n = new Set(s);
-      n.has(id) ? n.delete(id) : n.add(id);
+      n.has(email) ? n.delete(email) : n.add(email);
       return n;
     });
 
@@ -45,7 +45,7 @@ export default function SendModal({ payload, onClose }) {
 
   const recipients = useMemo(() => {
     if (mode === "own") return Array.from(new Set(manualList.filter(isEmail)));
-    return Array.from(new Set(contacts.filter((c) => picked.has(c._id)).map((c) => c.email)));
+    return Array.from(new Set(contacts.filter((c) => picked.has(c.email)).map((c) => c.email)));
   }, [mode, manualList, contacts, picked]);
 
   async function send() {
