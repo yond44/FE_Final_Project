@@ -131,8 +131,8 @@ export const dict = {
     "rec.nameEmailReq": "Name and email are required",
     "rec.copied": "Email list copied",
     "rec.copyFail": "Couldn't copy",
-    "rec.disclaimerTitle": "Heads up: this list gets emailed every 10 minutes",
-    "rec.disclaimerBody": "The n8n automation runs on a 10-minute schedule and sends a new briefing to every address below each time it fires. Only add addresses that should receive frequent emails, and remove anyone who wants to stop.",
+    "rec.disclaimerTitle": "Heads up: this list gets emailed once a day",
+    "rec.disclaimerBody": "The n8n automation runs on a daily schedule and sends a new briefing to every address below each time it fires. Only add addresses that should receive daily emails, and remove anyone who wants to stop.",
 
 
 
@@ -281,8 +281,8 @@ export const dict = {
     "rec.nameEmailReq": "Nama dan email wajib diisi",
     "rec.copied": "Daftar email disalin",
     "rec.copyFail": "Gagal menyalin",
-    "rec.disclaimerTitle": "Perhatian: daftar ini menerima email setiap 10 menit",
-    "rec.disclaimerBody": "Otomasi n8n berjalan setiap 10 menit dan mengirim ringkasan baru ke setiap alamat di bawah setiap kali berjalan. Tambahkan hanya alamat yang memang ingin menerima email sesering itu, dan hapus siapa pun yang ingin berhenti.",
+    "rec.disclaimerTitle": "Perhatian: daftar ini menerima email sekali sehari",
+    "rec.disclaimerBody": "Otomasi n8n berjalan setiap hari dan mengirim ringkasan baru ke setiap alamat di bawah setiap kali berjalan. Tambahkan hanya alamat yang memang ingin menerima email harian, dan hapus siapa pun yang ingin berhenti.",
 
 
 
