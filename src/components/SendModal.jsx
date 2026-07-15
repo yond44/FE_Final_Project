@@ -26,10 +26,10 @@ export default function SendModal({ payload, onClose }) {
     emailsApi.list().then((r) => setContacts(r.emails || [])).catch(() => {});
   }, []);
 
-  const toggle = (email) =>
+  const toggle = (id) =>
     setPicked((s) => {
       const n = new Set(s);
-      n.has(email) ? n.delete(email) : n.add(email);
+      n.has(id) ? n.delete(id) : n.add(id);
       return n;
     });
 
@@ -45,7 +45,7 @@ export default function SendModal({ payload, onClose }) {
 
   const recipients = useMemo(() => {
     if (mode === "own") return Array.from(new Set(manualList.filter(isEmail)));
-    return Array.from(new Set(contacts.filter((c) => picked.has(c.email)).map((c) => c.email)));
+    return Array.from(new Set(contacts.filter((c) => picked.has(c._id)).map((c) => c.email)));
   }, [mode, manualList, contacts, picked]);
 
   async function send() {
@@ -93,25 +93,10 @@ export default function SendModal({ payload, onClose }) {
       ) : (
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-ink2">{t("send.pickFromContacts")}</span>
-            <div className="flex items-center gap-3">
-              {picked.size > 0 && (
-                <span className="text-[11px] font-medium text-muted">{t("send.selectedCount", { n: picked.size })}</span>
-              )}
-              <button
-                onClick={() => setPicked(new Set(filtered.map((c) => c._id)))}
-                disabled={filtered.length === 0}
-                className="text-[11px] font-semibold text-blue hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
-              >
-                {t("common.all")}
-              </button>
-              <button
-                onClick={() => setPicked(new Set())}
-                disabled={picked.size === 0}
-                className="text-[11px] font-semibold text-muted hover:underline disabled:cursor-not-allowed disabled:text-faint disabled:no-underline"
-              >
-                {t("common.clear")}
-              </button>
+            <span className="text-xs font-semibold text-ink2">Pick from your contacts</span>
+            <div className="flex gap-3">
+              <button onClick={() => setPicked(new Set(filtered.map((c) => c._id)))} className="text-[11px] font-semibold text-blue hover:underline">{t("common.all")}</button>
+              <button onClick={() => setPicked(new Set())} className="text-[11px] font-semibold text-muted hover:underline">Clear</button>
             </div>
           </div>
           <div className="relative mt-2">
@@ -124,7 +109,7 @@ export default function SendModal({ payload, onClose }) {
             />
           </div>
           <div className="mt-2 max-h-44 space-y-0.5 overflow-y-auto rounded-lg border border-line2 bg-white p-1">
-            {filtered.length === 0 && <p className="px-2 py-3 text-xs text-muted">{t("send.noContacts")}</p>}
+            {filtered.length === 0 && <p className="px-2 py-3 text-xs text-muted">No saved contacts. Add them on the Recipients page.</p>}
             {filtered.map((c) => {
               const on = picked.has(c._id);
               return (

@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { MessageSquare, Users, Clock, LogOut, SendHorizonal } from "lucide-react";
+import { MessageSquare, Users, ListChecks, Workflow, Clock, LogOut, SendHorizonal, Activity } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { DEMO } from "../api/client.js";
@@ -10,6 +10,8 @@ const NAV = [
   { to: "/", key: "nav.chat", icon: MessageSquare, end: true },
   { to: "/send", key: "nav.send", icon: SendHorizonal },
   { to: "/recipients", key: "nav.recipients", icon: Users },
+  { to: "/automation", key: "nav.automation", icon: Workflow },
+  { to: "/system", key: "nav.system", icon: Activity },
   { to: "/history", key: "nav.history", icon: Clock },
 ];
 

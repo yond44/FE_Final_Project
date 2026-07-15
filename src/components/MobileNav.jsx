@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { MessageSquare, Users, Clock, SendHorizonal } from "lucide-react";
+import { MessageSquare, Users, ListChecks, Clock, SendHorizonal } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext.jsx";
 
 const NAV = [

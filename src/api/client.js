@@ -13,9 +13,11 @@ const TOKEN_KEY = "token";
 const APIKEY_KEY = "api_key";
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY) || "";
-export const setToken = (t) => (t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY));
+export const setToken = (t) =>
+  t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY);
 export const getApiKey = () => localStorage.getItem(APIKEY_KEY) || "";
-export const setApiKey = (k) => (k ? localStorage.setItem(APIKEY_KEY, k) : localStorage.removeItem(APIKEY_KEY));
+export const setApiKey = (k) =>
+  k ? localStorage.setItem(APIKEY_KEY, k) : localStorage.removeItem(APIKEY_KEY);
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -32,16 +34,24 @@ function authHeader() {
   return {};
 }
 
-export async function request(path, { method = "GET", body, params, auth = true } = {}) {
+export async function request(
+  path,
+  { method = "GET", body, params, auth = true } = {},
+) {
   let url = API_BASE + path;
   if (params) {
     const q = new URLSearchParams(
-      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== "")
+      Object.entries(params).filter(
+        ([, v]) => v !== undefined && v !== null && v !== "",
+      ),
     ).toString();
     if (q) url += "?" + q;
   }
 
-  const headers = { "Content-Type": "application/json", ...(auth ? authHeader() : {}) };
+  const headers = {
+    "Content-Type": "application/json",
+    ...(auth ? authHeader() : {}),
+  };
 
   let res;
   try {
@@ -70,7 +80,9 @@ export async function request(path, { method = "GET", body, params, auth = true 
   }
 
   if (!res.ok) {
-    const detail = (data && data.detail) || (typeof data === "string" ? data : res.statusText);
+    const detail =
+      (data && data.detail) ||
+      (typeof data === "string" ? data : res.statusText);
     throw new ApiError(detail || "Request failed", res.status);
   }
   return data;

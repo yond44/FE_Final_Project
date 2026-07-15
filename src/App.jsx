@@ -5,7 +5,9 @@ import { Login, Register } from "./pages/Auth.jsx";
 import Chat from "./pages/Chat.jsx";
 import Send from "./pages/Send.jsx";
 import Recipients from "./pages/Recipients.jsx";
+import Automation from "./pages/Automation.jsx";
 import History from "./pages/History.jsx";
+import System from "./pages/System.jsx";
 import Ticker from "./components/Ticker.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import MobileNav from "./components/MobileNav.jsx";
@@ -48,8 +50,11 @@ export default function App() {
       <Route element={<Protected />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Chat />} />
+          <Route path="/chat/:chatId" element={<Chat />} />
           <Route path="/send" element={<Send />} />
           <Route path="/recipients" element={<Recipients />} />
+          <Route path="/automation" element={<Automation />} />
+          <Route path="/system" element={<System />} />
           <Route path="/history" element={<History />} />
         </Route>
       </Route>
