@@ -16,12 +16,37 @@ import AnswerInsights from '../components/AnswerInsights.jsx';
 import FilterBar from '../components/FilterBar.jsx';
 import ChatHistoryMenu from '../components/ChatHistoryMenu.jsx';
 
+// Helper function to clean malformed markdown
+function cleanMarkdown(text) {
+  if (!text) return '';
+  
+  let cleaned = text;
+  
+  // Fix **text* -> **text**
+  cleaned = cleaned.replace(/\*\*([^*]+)\*/g, '**$1**');
+  
+  // Fix *text** -> **text**
+  cleaned = cleaned.replace(/\*([^*]+)\*\*/g, '**$1**');
+  
+  // Remove orphaned asterisks (single * with no matching pair)
+  cleaned = cleaned.replace(/\*(?![^*]*\*)/g, '');
+  
+  // Fix bold formatting that might be broken
+  cleaned = cleaned.replace(/\*{2,}([^*]+)\*{2,}/g, '**$1**');
+  
+  // Fix list items with broken formatting
+  cleaned = cleaned.replace(/^-\s*/gm, '- ');
+  
+  // Fix numbered lists
+  cleaned = cleaned.replace(/^\d+\.\s*/gm, (match) => match);
+  
+  // Clean up extra spaces
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+  
+  return cleaned;
+}
+
 export default function Chat() {
-  // Some routers name this param `:chatId`, others `:id`. Reading both means
-  // this component keeps working regardless of how the <Route> is declared,
-  // instead of silently reading `undefined` on every render if the names
-  // don't match (which looks exactly like "every navigation resets to a new
-  // chat", since the effect below then always falls into its `else` branch).
   const routeParams = useParams();
   console.log('routeParams:', routeParams);
   const routeChatId = routeParams.chatId ?? routeParams.id ?? null;
@@ -41,33 +66,17 @@ export default function Chat() {
   const endRef = useRef(null);
   const taRef = useRef(null);
 
-  // send() sets this to a chat id right before it calls navigate() for a
-  // brand-new chat. That navigate() changes the route param, which re-fires
-  // the effect below — but send() is already about to fetch and patch that
-  // same chat's messages itself. Without this guard, both fetches race, and
-  // if the effect's fetch loses the race (or just errors out) its catch
-  // block navigates back to `/chat`, wiping the conversation even though the
-  // backend already saved it correctly.
+
   const skipNextLoadRef = useRef(null);
 
-  // Mirrors currentChatId, but as a ref so in-flight async work (like the
-  // tail end of send(), below) can check — after an await — whether the
-  // user has since switched to a different chat, instead of relying on a
-  // closured value that's frozen at the moment that async work started.
-  // send() also reads FROM this ref (not the `currentChatId` state variable)
-  // when building the outgoing request, so a stale closure can never send a
-  // wrong/stale thread_id to the backend.
+
   const activeChatIdRef = useRef(null);
   function setActiveChat(id) {
     activeChatIdRef.current = id;
     setCurrentChatId(id);
   }
 
-  // Reacts ONLY to the route's chat id changing. Deliberately does not
-  // depend on `lang` — that used to sit in this same effect, which meant
-  // any language-context re-render could re-run this logic and, depending
-  // on timing, re-trigger the "no chat selected" reset branch below even
-  // though the user never navigated anywhere.
+  
   useEffect(() => {
     if (routeChatId && routeChatId !== 'undefined') {
       if (skipNextLoadRef.current === routeChatId) {
@@ -83,11 +92,10 @@ export default function Chat() {
       setChatTitle('New Chat');
       setActiveChat(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [routeChatId]);
 
-  // Handles language switching separately: only touches the welcome message
-  // (and only if that's actually what's on screen), never a loaded chat.
+
   useEffect(() => {
     setMessages((prev) => {
       if (prev.length === 1 && prev[0].id === 'welcome') {
@@ -100,9 +108,7 @@ export default function Chat() {
   async function loadChat(id) {
     try {
       const data = await chatApi.getChat(id);
-      // Only apply this if the user is still looking at the chat we fetched —
-      // if they've since switched elsewhere, silently drop it rather than
-      // yanking their current view out from under them.
+
       if (activeChatIdRef.current !== id) return;
       setChatTitle(data.title || 'Chat');
       let formattedMessages = data.messages || [];
@@ -112,10 +118,7 @@ export default function Chat() {
       setMessages(formattedMessages);
       setShowThemes(false);
     } catch (error) {
-      // Don't navigate away on a failed load — the chat is very likely fine
-      // on the backend (a transient network hiccup here shouldn't nuke
-      // whatever's currently on screen). Just let the person know and leave
-      // the view as-is so they can retry (e.g. by reselecting the chat).
+
       toast.error('Failed to load chat');
     }
   }
@@ -137,9 +140,7 @@ export default function Chat() {
     setInput('');
     setShowThemes(false);
 
-    // Read from the ref, not the `currentChatId` state variable — this is
-    // the value the backend needs (thread_id) to keep answering into the
-    // SAME chat instead of silently starting a new one.
+
     const threadIdAtSend = activeChatIdRef.current;
 
     const aiId = `assistant_${Date.now()}`;
@@ -169,9 +170,7 @@ export default function Chat() {
       });
 
       if (activeChatIdRef.current !== threadIdAtSend) {
-        // The person switched to a different chat while this was in flight.
-        // It's already saved server-side under the original chat, so just
-        // stop here rather than pulling their current view back to it.
+
         return;
       }
 
@@ -185,8 +184,6 @@ export default function Chat() {
       }
 
       if (newChatId) {
-        // The /ask call already saved both turns to chat_sessions/chat_messages.
-        // Reload through chat_routes so what's on screen matches what's stored.
         const data = await chatApi.getChat(newChatId);
         setChatTitle(data.title || 'Chat');
         const allMessages = data.messages || [];
@@ -210,8 +207,6 @@ export default function Chat() {
           });
         }
       } else {
-        // DEMO mode (or any response without a chat_id) falls back to the
-        // raw answer since there's nothing persisted to reload.
         patch({
           streaming: false,
           text: result.answer || '',
@@ -347,7 +342,37 @@ function Bubble({ m, t, onSend, onRec }) {
             </div>
           ) : (
             <div className="prose prose-sm max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text || m.content || ''}</ReactMarkdown>
+              <ReactMarkdown 
+                remarkPlugins={[remarkGfm]}
+                children={cleanMarkdown(m.text || m.content || '')}
+                components={{
+                  // Custom renderers to fix common issues
+                  strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+                  em: ({ node, ...props }) => <em className="italic" {...props} />,
+                  p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                  ul: ({ node, ...props }) => <ul className="list-disc pl-4 mb-2" {...props} />,
+                  ol: ({ node, ...props }) => <ol className="list-decimal pl-4 mb-2" {...props} />,
+                  li: ({ node, ...props }) => <li className="mb-0.5" {...props} />,
+                  h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2" {...props} />,
+                  h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2" {...props} />,
+                  h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1.5" {...props} />,
+                  h4: ({ node, ...props }) => <h4 className="text-sm font-semibold mb-1.5" {...props} />,
+                  h5: ({ node, ...props }) => <h5 className="text-sm font-semibold mb-1.5" {...props} />,
+                  h6: ({ node, ...props }) => <h6 className="text-sm font-semibold mb-1.5" {...props} />,
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote className="border-l-4 border-blue pl-3 italic my-2" {...props} />
+                  ),
+                  code: ({ node, inline, ...props }) => 
+                    inline ? (
+                      <code className="bg-gray-100 px-1 py-0.5 rounded text-sm" {...props} />
+                    ) : (
+                      <code className="block bg-gray-100 p-3 rounded text-sm overflow-x-auto" {...props} />
+                    ),
+                  pre: ({ node, ...props }) => <pre className="bg-gray-100 p-3 rounded overflow-x-auto" {...props} />,
+                  a: ({ node, ...props }) => <a className="text-blue hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                  hr: ({ node, ...props }) => <hr className="my-3 border-line" {...props} />,
+                }}
+              />
               {m.streaming && <span className="ml-0.5 inline-block h-3.5 w-1.5 animate-pulse2 bg-blue align-middle" />}
             </div>
           )}
