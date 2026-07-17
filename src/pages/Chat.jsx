@@ -17,33 +17,18 @@ import FilterBar from '../components/FilterBar.jsx';
 import ChatHistoryMenu from '../components/ChatHistoryMenu.jsx';
 
 // Helper function to clean malformed markdown
+// Penyembuh Markdown MINIMAL. Aturan lama justru merusak: regex bintangnya
+// memasangkan ** lintas baris ([^*] ikut melahap \n), dan replace(/\s+/g,' ')
+// MERATAKAN SEMUA NEWLINE — heading/bullet/paragraf hancur sebelum sampai ke
+// ReactMarkdown. Struktur baris tidak boleh disentuh; parser yang mengurus
+// sisanya. Satu-satunya patologi nyata dari model: penutup bold terbelah
+// baris ("**Label*\n* teks…"), dan itu saja yang ditambal.
 function cleanMarkdown(text) {
   if (!text) return '';
-  
-  let cleaned = text;
-  
-  // Fix **text* -> **text**
-  cleaned = cleaned.replace(/\*\*([^*]+)\*/g, '**$1**');
-  
-  // Fix *text** -> **text**
-  cleaned = cleaned.replace(/\*([^*]+)\*\*/g, '**$1**');
-  
-  // Remove orphaned asterisks (single * with no matching pair)
-  cleaned = cleaned.replace(/\*(?![^*]*\*)/g, '');
-  
-  // Fix bold formatting that might be broken
-  cleaned = cleaned.replace(/\*{2,}([^*]+)\*{2,}/g, '**$1**');
-  
-  // Fix list items with broken formatting
-  cleaned = cleaned.replace(/^-\s*/gm, '- ');
-  
-  // Fix numbered lists
-  cleaned = cleaned.replace(/^\d+\.\s*/gm, (match) => match);
-  
-  // Clean up extra spaces
-  cleaned = cleaned.replace(/\s+/g, ' ').trim();
-  
-  return cleaned;
+  // "…Label*\n* teks" -> "…Label** teks"  (bold tertutup, baris tetap utuh)
+  return String(text)
+    .replace(/(\S)\*\n\*(?=\s)/g, '$1**')      // sesudahnya sudah ada spasi
+    .replace(/(\S)\*\n\*(?!\*)/g, '$1** ');    // sesudahnya nempel teks
 }
 
 export default function Chat() {
@@ -370,6 +355,14 @@ function Bubble({ m, t, onSend, onRec }) {
                     ),
                   pre: ({ node, ...props }) => <pre className="bg-gray-100 p-3 rounded overflow-x-auto" {...props} />,
                   a: ({ node, ...props }) => <a className="text-blue hover:underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                  table: ({ node, ...props }) => (
+                    <div className="my-2 overflow-x-auto">
+                      <table className="w-full border-collapse text-[13px]" {...props} />
+                    </div>
+                  ),
+                  thead: ({ node, ...props }) => <thead {...props} />,
+                  th: ({ node, ...props }) => <th className="border border-line bg-bluesoft px-2.5 py-1.5 text-left font-semibold text-ink" {...props} />,
+                  td: ({ node, ...props }) => <td className="border border-line2 px-2.5 py-1.5 align-top" {...props} />,
                   hr: ({ node, ...props }) => <hr className="my-3 border-line" {...props} />,
                 }}
               />
